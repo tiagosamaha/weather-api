@@ -6,7 +6,7 @@ from rest_api.views import WeatherViewSet
 
 
 router = routers.DefaultRouter()
-router.register(r'weathers', WeatherViewSet)
+router.register(r'weather', WeatherViewSet)
 
 
 urlpatterns = [
