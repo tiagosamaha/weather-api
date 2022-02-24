@@ -93,32 +93,24 @@ class WeatherEndpointWithPOSTTestCase(TestCase):
           "lon": 137.61848,
           "city": "",
           "state": "",
-          "temperatures": [],
+          "temperatures": [10.5],
         }
-        fields_with_error = ['date', 'temperatures', 'lat', 'lon', 'city', 'state']
+        fields_with_error = [
+            ['date', 'Date has wrong format. Use one of these formats instead: YYYY-MM-DD.'],
+            ['temperatures', 'Define hourly temperatures.'],
+            ['lat', 'Ensure that there are no more than 6 digits in total.'],
+            ['lon', 'Ensure that there are no more than 7 digits in total.'],
+            ['city', 'This field may not be blank.'],
+            ['state', 'This field may not be blank.'],
+        ]
         r = self.client.post(self.url, data=invalid_payload)
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
         data = r.json()
-        self.assertEqual(len(data.keys()), len(fields_with_error))
+
         for field in fields_with_error:
             with self.subTest():
-                self.assertIn(field, list(data.keys()))
+                self.assertIn(field[1], data.get(field[0]))
         # raise NotImplementedError()
-    
-    def test_invalid_temperatures_hourly(self):
-        invalid_payload = {
-            "date": "2022-02-24",
-            "lat": 22.9068,
-            "lon": 43.1729,
-            "city": "Rio de Janeiro",
-            "state": "Rio de Janeiro",
-            "temperatures": [40.5],
-        }
-        r = self.client.post(self.url, data=invalid_payload)
-        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
-        data = r.json()
-        self.assertIn('Define hourly temperatures', data.get('temperatures'))
-        
 
 
 class WeatherEndpointWithGETSingleTestCase(TestCase):
