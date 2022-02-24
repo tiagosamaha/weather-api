@@ -64,7 +64,7 @@ class WeatherModelTestCase(TestCase):
     def test_create(self):
         self.assertTrue(Weather.objects.exists())
     
-    def test_invalid(self):
+    def test_missing_attributes(self):
         weather = Weather()
         with self.assertRaises(ValidationError):
             weather.full_clean()
