@@ -1,9 +1,12 @@
 from json.decoder import JSONDecodeError
 
+from django.forms import ValidationError
 from django.shortcuts import resolve_url
 from django.test import TestCase
 from rest_framework.test import RequestsClient
 from rest_framework import status
+
+from .models import Weather
 
 
 chicago = {
@@ -52,6 +55,20 @@ moscow2 = {
 }
 
 HOST = 'http://localhost:8000'
+
+class WeatherModelTestCase(TestCase):
+    def setUp(self):
+        self.obj = Weather(**chicago)
+        self.obj.save()
+    
+    def test_create(self):
+        self.assertTrue(Weather.objects.exists())
+    
+    def test_invalid(self):
+        weather = Weather()
+        with self.assertRaises(ValidationError):
+            weather.full_clean()
+
 
 class WeatherEndpointWithPOSTTestCase(TestCase):
 
