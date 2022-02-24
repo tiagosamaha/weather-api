@@ -278,3 +278,22 @@ class WeatherEndpointWithGETListAndDateOrderTestCase(TestCase):
         self.assertEqual(r.status_code, status.HTTP_200_OK)
         data = r.json()
         self.assertListEqual(data, expected_objects)
+
+
+class WeatherEndpointWithDELETETestCase(TestCase):
+    def setUp(self):
+        self.client = RequestsClient()
+        self.url = HOST + '/weather/'
+        try:
+            self.objects = [self.client.post(self.url, data=city).json()
+                            for city in [chicago, oakland, london, moscow1, moscow2]]
+        except JSONDecodeError:
+            self.fail("/weather endpoint for POST request not implemented")
+    
+    def test_delete_weather(self):
+        url = HOST + resolve_url('weather-detail', pk=1)
+        r = self.client.delete(url)
+        self.assertEqual(r.status_code, status.HTTP_204_NO_CONTENT)
+        r = self.client.get(self.url)
+        data = r.json()
+        self.assertEqual(len(data), 4)
