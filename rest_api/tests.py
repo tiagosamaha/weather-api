@@ -69,6 +69,14 @@ class WeatherEndpointWithPOSTTestCase(TestCase):
         
     def test_with_invalid_data(self):
         # implement the rest of the test
+        invalid_payload = {
+          "date": "2018-03-12",
+          "lat": 55.7512,
+          "lon": 37.6184,
+          "city": "Moscow",
+          "state": "N/A",
+          "temperatures": [],
+        }
         raise NotImplementedError()
 
 
@@ -137,7 +145,12 @@ class WeatherEndpointWithGETListAndDateFilterTestCase(TestCase):
         date = "2015-06-06"
         expected_objects = []
         # implement the rest of the test
-        raise NotImplementedError()
+        url = self.url + ('?date=%s' % date)
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        data = r.json()
+        self.assertListEqual(data, expected_objects)
+        # raise NotImplementedError()
 
 
 class WeatherEndpointWithGETListAndCityFilterTestCase(TestCase):

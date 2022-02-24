@@ -123,3 +123,7 @@ STATIC_URL = '/static/'
 
 TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
 TEST_OUTPUT_FILE_NAME = 'unit.xml'
+
+REST_FRAMEWORK = {
+    'ORDERING_PARAM': 'sort'
+}
