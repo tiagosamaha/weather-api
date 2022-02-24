@@ -4,7 +4,9 @@ from .models import Weather
 
 
 class WeatherSerializer(serializers.ModelSerializer):
-    temperatures = serializers.ListField(child=serializers.FloatField())
+    temperatures = serializers.ListField(
+        child=serializers.DecimalField(max_digits=3, decimal_places=1, coerce_to_string=False)
+    )
     lat = serializers.DecimalField(max_digits=6, decimal_places=4, coerce_to_string=False)
     lon = serializers.DecimalField(max_digits=7, decimal_places=4, coerce_to_string=False)
 
@@ -15,4 +17,4 @@ class WeatherSerializer(serializers.ModelSerializer):
     def validate_temperatures(self, value):
         if len(value) != 24:
             raise serializers.ValidationError('Define hourly temperatures.')
-        return value
+        return [float(v) for v in value]
