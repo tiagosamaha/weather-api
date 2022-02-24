@@ -73,7 +73,7 @@ class WeatherEndpointWithPOSTTestCase(TestCase):
         invalid_payload = {
           "date": "2018-13-12",
           "lat": 55.75128,
-          "lon": 37.61848,
+          "lon": 137.61848,
           "city": "",
           "state": "",
           "temperatures": [],
