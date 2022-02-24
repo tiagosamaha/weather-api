@@ -1,5 +1,6 @@
 from json.decoder import JSONDecodeError
 
+from django.shortcuts import resolve_url
 from django.test import TestCase
 from rest_framework.test import RequestsClient
 from rest_framework import status
@@ -70,14 +71,37 @@ class WeatherEndpointWithPOSTTestCase(TestCase):
     def test_with_invalid_data(self):
         # implement the rest of the test
         invalid_payload = {
-          "date": "2018-03-12",
-          "lat": 55.7512,
-          "lon": 37.6184,
-          "city": "Moscow",
-          "state": "N/A",
+          "date": "2018-13-12",
+          "lat": 55.75128,
+          "lon": 37.61848,
+          "city": "",
+          "state": "",
           "temperatures": [],
         }
-        raise NotImplementedError()
+        fields_with_error = ['date', 'temperatures', 'lat', 'lon', 'city', 'state']
+        r = self.client.post(self.url, data=invalid_payload)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+        data = r.json()
+        self.assertEqual(len(data.keys()), len(fields_with_error))
+        for field in fields_with_error:
+            with self.subTest():
+                self.assertIn(field, list(data.keys()))
+        # raise NotImplementedError()
+    
+    def test_invalid_temperatures_hourly(self):
+        invalid_payload = {
+            "date": "2022-02-24",
+            "lat": 22.9068,
+            "lon": 43.1729,
+            "city": "Rio de Janeiro",
+            "state": "Rio de Janeiro",
+            "temperatures": [40.5],
+        }
+        r = self.client.post(self.url, data=invalid_payload)
+        self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
+        data = r.json()
+        self.assertIn('Define hourly temperatures', data.get('temperatures'))
+        
 
 
 class WeatherEndpointWithGETSingleTestCase(TestCase):
@@ -92,11 +116,21 @@ class WeatherEndpointWithGETSingleTestCase(TestCase):
 
     def test_with_existing_record(self):
         # implement the rest of the test
-        raise NotImplementedError()
+        url = HOST + resolve_url('weather-detail', pk=1)
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        data = r.json()
+        self.assertEqual(data, self.chicago)
+        # raise NotImplementedError()
 
     def test_with_non_existing_record(self):
         # implement the rest of the test
-        raise NotImplementedError()
+        url = HOST + resolve_url('weather-detail', pk=0)
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, status.HTTP_404_NOT_FOUND)
+        data = r.json()
+        self.assertEqual(data, {'detail': 'Not found.'})
+        # raise NotImplementedError()
 
 
 class WeatherEndpointWithGETListTestCase(TestCase):
@@ -179,13 +213,24 @@ class WeatherEndpointWithGETListAndCityFilterTestCase(TestCase):
         cities = ['moscow', 'London', 'ChicaGo']
         expected_objects = [self.objects[0], self.objects[2], self.objects[3], self.objects[4]]
         # implement the rest of the test
-        raise NotImplementedError()
+        cities = ','.join(cities)
+        url = self.url + ('?city=%s' % cities)
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        data = r.json()
+        self.assertListEqual(data, expected_objects)
+        # raise NotImplementedError()
 
     def test_with_no_results(self):
         cities = "berlin,amsterdam"
         expected_objects = []
         # implement the rest of the test
-        raise NotImplementedError()
+        url = self.url + ('?city=%s' % cities)
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        data = r.json()
+        self.assertListEqual(data, expected_objects)
+        # raise NotImplementedError()
 
 
 class WeatherEndpointWithGETListAndDateOrderTestCase(TestCase):

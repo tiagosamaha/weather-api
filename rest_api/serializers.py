@@ -11,3 +11,8 @@ class WeatherSerializer(serializers.ModelSerializer):
     class Meta:
         model = Weather
         fields = '__all__'
+
+    def validate_temperatures(self, value):
+        if len(value) != 24:
+            raise serializers.ValidationError('Define hourly temperatures')
+        return value
